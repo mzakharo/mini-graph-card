@@ -131,7 +131,6 @@ export default class Graph {
     return coords2;
   }
 
-
   getPath() {
     let { coords } = this;
     if (coords.length === 1) {
@@ -186,10 +185,12 @@ export default class Graph {
   }
 
   getFill(path) {
-    const height = this.height + this.margin[Y] * 4;
     let fill = path;
-    fill += ` L ${this.width - this.margin[X] * 2}, ${height}`;
-    fill += ` L ${this.coords[0][X]}, ${height} z`;
+    fill = '';
+    fill += 'M0,0';
+    fill += ` ${this.width},${this.margin[Y]}`;
+    fill += ` ${this.width},${this.height}`;
+    fill += ` L 0, ${this.height} z`;
     return fill;
   }
 

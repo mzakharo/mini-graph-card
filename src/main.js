@@ -48,6 +48,7 @@ class MiniGraphCard extends LitElement {
     this.stateChanged = false;
     this.initial = true;
     this._md5Config = undefined;
+    this.last_updated = new Date();
   }
 
   static get styles() {
@@ -65,6 +66,7 @@ class MiniGraphCard extends LitElement {
         this.entity[index] = entityState;
         queue.push(`${entityState.entity_id}-${index}`);
         updated = true;
+        this.last_updated = entityState.last_updated;
       }
     });
     if (updated) {
@@ -242,7 +244,6 @@ class MiniGraphCard extends LitElement {
       ? this.computeName(this.tooltip.entity)
       : this.config.name || this.computeName(0);
     const color = this.config.show.name_adaptive_color ? `opacity: 1; color: ${this.color};` : '';
-
     return html`
       <div class="name flex">
         <span class="ellipsis" style=${color}>${name}</span>
@@ -258,6 +259,7 @@ class MiniGraphCard extends LitElement {
           ${this.renderState(firstEntityConfig, 0)}
           <div class="states--secondary">${this.config.entities.map((entityConfig, i) => i > 0 && this.renderState(entityConfig, i) || '')}</div>
           ${this.config.align_icon === 'state' ? this.renderIcon() : ''}
+          ${getTime(new Date(this.last_updated), this.config.format, this._hass.language)}
         </div>
       `;
   }

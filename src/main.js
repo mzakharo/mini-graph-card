@@ -253,13 +253,16 @@ class MiniGraphCard extends LitElement {
 
   renderStates() {
     const [firstEntityConfig] = this.config.entities;
+    var diff = new Date() - new Date(this.last_updated);
+    var minutes = Math.floor((diff/1000)/60);
+
     if (this.config.show.state)
       return html`
         <div class="states flex" loc=${this.config.align_state}>
           ${this.renderState(firstEntityConfig, 0)}
           <div class="states--secondary">${this.config.entities.map((entityConfig, i) => i > 0 && this.renderState(entityConfig, i) || '')}</div>
           ${this.config.align_icon === 'state' ? this.renderIcon() : ''}
-          ${getTime(new Date(this.last_updated), this.config.format, this._hass.language)}
+          ${minutes} minutes ago
         </div>
       `;
   }
@@ -714,7 +717,7 @@ class MiniGraphCard extends LitElement {
   }
 
   updateOnInterval() {
-    if (this.stateChanged && !this.updating) {
+    if (!this.updating) {
       this.stateChanged = false;
       this.updateData();
     }

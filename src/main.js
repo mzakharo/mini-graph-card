@@ -43,7 +43,6 @@ class MiniGraphCard extends LitElement {
     this.points = [];
     this.gradient = [];
     this.tooltip = {};
-    this.updateQueue = [];
     this.updating = false;
     this.stateChanged = false;
     this.initial = true;
@@ -74,11 +73,9 @@ class MiniGraphCard extends LitElement {
       this.entity = [...this.entity];
       if (!this.config.update_interval && !this.updating) {
         setTimeout(() => {
-          this.updateQueue = [...queue, ...this.updateQueue];
           this.updateData();
         }, this.initial ? 0 : 1000);
       } else {
-        this.updateQueue = [...queue, ...this.updateQueue];
       }
     }
   }
@@ -97,7 +94,6 @@ class MiniGraphCard extends LitElement {
       boundSecondary: [],
       abs: [],
       tooltip: {},
-      updateQueue: [],
       color: String,
     };
   }
@@ -845,12 +841,11 @@ class MiniGraphCard extends LitElement {
   }
 
   async updateEntity(entity, index, initStart, end) {
+    
     if (!entity
-      || !this.updateQueue.includes(`${entity.entity_id}-${index}`)
       || this.config.entities[index].show_graph === false
     ) return;
-    this.updateQueue = this.updateQueue.filter(entry => entry !== `${entity.entity_id}-${index}`);
-
+     
     let stateHistory = [];
     let start = initStart;
     let skipInitialState = false;

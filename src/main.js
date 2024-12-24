@@ -75,7 +75,6 @@ class MiniGraphCard extends LitElement {
         setTimeout(() => {
           this.updateData();
         }, this.initial ? 0 : 1000);
-      } else {
       }
     }
   }
@@ -225,17 +224,6 @@ class MiniGraphCard extends LitElement {
   }
 
   renderIcon() {
-<<<<<<< HEAD
-=======
-    if (this.config.icon_image !== undefined) {
-      return html`
-        <div class="icon">
-          <img src="${this.config.icon_image}" height="25"/>
-        </div>
-      `;
-    }
-
->>>>>>> v0.12.1
     const { icon, icon_adaptive_color } = this.config.show;
     return icon ? html`
       <div class="icon" loc=${this.config.align_icon}
@@ -260,8 +248,8 @@ class MiniGraphCard extends LitElement {
 
   renderStates() {
     const [firstEntityConfig] = this.config.entities;
-    var diff = new Date() - new Date(this.last_updated);
-    var minutes = Math.floor((diff/1000)/60);
+    const diff = new Date() - new Date(this.last_updated);
+    const minutes = Math.floor((diff / 1000) / 60);
 
     if (this.config.show.state)
       return html`
@@ -863,11 +851,9 @@ class MiniGraphCard extends LitElement {
   }
 
   async updateEntity(entity, index, initStart, end) {
-    
     if (!entity
       || this.config.entities[index].show_graph === false
     ) return;
-     
     let stateHistory = [];
     let start = initStart;
     let skipInitialState = false;

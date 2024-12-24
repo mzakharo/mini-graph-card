@@ -239,6 +239,7 @@ class MiniGraphCard extends LitElement {
       ? this.computeName(this.tooltip.entity)
       : this.config.name || this.computeName(0);
     const color = this.config.show.name_adaptive_color ? `opacity: 1; color: ${this.color};` : '';
+
     return html`
       <div class="name flex">
         <span class="ellipsis" style=${color}>${name}</span>
@@ -250,7 +251,6 @@ class MiniGraphCard extends LitElement {
     const [firstEntityConfig] = this.config.entities;
     const diff = new Date() - new Date(this.last_updated);
     const minutes = Math.floor((diff / 1000) / 60);
-
     if (this.config.show.state)
       return html`
         <div class="states flex" loc=${this.config.align_state}>

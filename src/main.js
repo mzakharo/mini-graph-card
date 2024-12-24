@@ -225,6 +225,17 @@ class MiniGraphCard extends LitElement {
   }
 
   renderIcon() {
+<<<<<<< HEAD
+=======
+    if (this.config.icon_image !== undefined) {
+      return html`
+        <div class="icon">
+          <img src="${this.config.icon_image}" height="25"/>
+        </div>
+      `;
+    }
+
+>>>>>>> v0.12.1
     const { icon, icon_adaptive_color } = this.config.show;
     return icon ? html`
       <div class="icon" loc=${this.config.align_icon}
@@ -263,12 +274,16 @@ class MiniGraphCard extends LitElement {
       `;
   }
 
+  getObjectAttr(obj, path) {
+    return path.split('.').reduce((res, key) => res && res[key], obj);
+  }
+
   getEntityState(id) {
     const entityConfig = this.config.entities[id];
     if (this.config.show.state === 'last') {
       return this.points[id][this.points[id].length - 1][V];
     } else if (entityConfig.attribute) {
-      return this.entity[id].attributes[entityConfig.attribute];
+      return this.getObjectAttr(this.entity[id].attributes, entityConfig.attribute);
     } else {
       return this.entity[id].state;
     }
@@ -286,7 +301,7 @@ class MiniGraphCard extends LitElement {
           style=${entityConfig.state_adaptive_color ? `color: ${this.computeColor(state, id)};` : ''}>
           ${entityConfig.show_indicator ? this.renderIndicator(state, id) : ''}
           <span class="state__value ellipsis">
-            ${this.computeState(isPrimary && tooltipValue || state)}
+            ${this.computeState((isPrimary && tooltipValue !== undefined) ? tooltipValue : state)}
           </span>
           <span class="state__uom ellipsis">
             ${this.computeUom(isPrimary && entity || id)}
@@ -516,27 +531,34 @@ class MiniGraphCard extends LitElement {
 
   setTooltip(entity, index, value, label = null) {
     const {
+      group_by,
       points_per_hour,
       hours_to_show,
       format,
     } = this.config;
-    const offset = hours_to_show < 1 && points_per_hour < 1
-      ? points_per_hour * hours_to_show
-      : 1 / points_per_hour;
 
-    const id = Math.abs(index + 1 - Math.ceil(hours_to_show * points_per_hour));
+    // time units in milliseconds in this function
+    const interval = getMilli(1 / points_per_hour);
+    const n_points = Math.ceil(hours_to_show * points_per_hour);
+
+    // index is 0 (oldest) to n_points-1 (most recent ~= now)
+    // count of intervals from now to end of bin
+    // count is 0 (now) to n_points-1 (oldest)
+    const count = (n_points - 1) - index;
+
+    // offset end by a minute, if grouped by, e.g., date or hour
+    const oneMinute = group_by !== 'interval' ? 60000 : 0;
 
     const now = this.getEndDate();
 
-    const oneMinInHours = 1 / 60;
-    now.setMilliseconds(now.getMilliseconds() - getMilli(offset * id + oneMinInHours));
+    now.setMilliseconds(now.getMilliseconds() - oneMinute - interval * count);
     const end = getTime(now, format, this._hass.language);
-    now.setMilliseconds(now.getMilliseconds() - getMilli(offset - oneMinInHours));
+    now.setMilliseconds(now.getMilliseconds() + oneMinute - interval);
     const start = getTime(now, format, this._hass.language);
 
     this.tooltip = {
       value,
-      id,
+      count,
       entity,
       time: [start, end],
       index,
@@ -899,7 +921,7 @@ class MiniGraphCard extends LitElement {
         newStateHistory[0].forEach((item) => {
           if (this.config.entities[index].attribute) {
             // eslint-disable-next-line no-param-reassign
-            item.state = item.attributes[this.config.entities[index].attribute];
+            item.state = this.getObjectAttr(item.attributes, this.config.entities[index].attribute);
             // eslint-disable-next-line no-param-reassign
             delete item.attributes;
           }

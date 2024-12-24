@@ -130,6 +130,7 @@ export default class Graph {
     }
   }
 
+
   getPath() {
     let { coords } = this;
     if (coords.length === 1) {
